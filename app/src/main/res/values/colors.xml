@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="memoPaper">#d9ffc2</color>
+    <color name="modifyingPaper">#ccf2ff</color>
+    <color name="deletingPaper">#ffffb6</color>
+
+    <color name="calendar">#edfaff</color>
+    <color name="selected">#a3cff6</color>
+    <color name="brown">#6b3d16</color>
+
+    <color name="colorYellow">#ffffb6</color>
+    <color name="colorRed">#ffdbcf</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorGray">#ebebeb</color>
+    <color name="darkBlue">#dddae6</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="colorDarkGray">#aaaaaa</color>
+    <color name="colorPink">#ffe8f5</color>
+
+</resources>
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+    <!--<resources>-->
+    <!--    <color name="colorPrimary">#6200EE</color>-->
+    <!--    <color name="colorPrimaryDark">#3700B3</color>-->
+    <!--    <color name="colorAccent">#03DAC5</color>-->
+    <!--    <color name="colorWhite">#FFFFFF</color>-->
+    <!--</resources>-->
