@@ -10,9 +10,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.utils.ColorTemplate;
@@ -23,13 +28,15 @@ import static android.graphics.Color.BLUE;
 import static android.graphics.Color.RED;
 
 //월간 그래프
+//기존: 원형그래프였으나 수정필요
+//대체: 꺾은선 그래프로 임시조치 Piechart->Linechart
 public class MonthActivity extends AppCompatActivity {
     Switch sw;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_month);
-        PieChart pieChart = findViewById(R.id.PieChart);
+        LineChart lineChart = findViewById(R.id.LineChart);
 
         sw=(Switch)findViewById(R.id.switch1);
         CheckState();
@@ -85,24 +92,36 @@ public class MonthActivity extends AppCompatActivity {
         });
     }
     private void CheckState() {
-        PieChart pieChart = findViewById(R.id.PieChart);
+        LineChart lineChart = findViewById(R.id.LineChart);
+        double sum = 0,sumF=0;
+        TextView textView = findViewById(R.id.text1);
+
         //mysql값을 받아오는 것으로 변경예정
         //친구와의 비교
         if (sw.isChecked()) {
+            TextView btn = findViewById(R.id.btn3);
+            btn.setText("COMPARE REPORT");
             ArrayList <Entry>GoodBad = new ArrayList();
+            ArrayList<Entry> GoodBad_Friend = new ArrayList<>();
 
             GoodBad.add(new Entry(46f, 0));
             GoodBad.add(new Entry(51f, 1));
             GoodBad.add(new Entry(73f, 2));
             GoodBad.add(new Entry(41f, 3));
             GoodBad.add(new Entry(60f, 4));
-            GoodBad.add(new Entry(69f, 5));
-            GoodBad.add(new Entry(69f, 6));
-            GoodBad.add(new Entry(69f, 7));
-            GoodBad.add(new Entry(73f, 8));
-            GoodBad.add(new Entry(41f, 9));
+//            GoodBad.add(new Entry(69f, 5));
+//            GoodBad.add(new Entry(69f, 6));
+//            GoodBad.add(new Entry(69f, 7));
+//            GoodBad.add(new Entry(73f, 8));
+//            GoodBad.add(new Entry(41f, 9));
 
-            PieDataSet dataSet = new PieDataSet(GoodBad, "Good Posture");
+            GoodBad_Friend.add(new Entry(69f,0));
+            GoodBad_Friend.add(new Entry(69f,1));
+            GoodBad_Friend.add(new Entry(69f,2));
+            GoodBad_Friend.add(new Entry(73f,3));
+            GoodBad_Friend.add(new Entry(41f,4));
+
+            LineDataSet dataSet = new LineDataSet(GoodBad, "Good Posture");
             ArrayList day = new ArrayList();
             //x축 기간
             day.add("4week");
@@ -110,38 +129,76 @@ public class MonthActivity extends AppCompatActivity {
             day.add("2week");
             day.add("1week");
             day.add("Recent");
-            day.add("4week.f");
-            day.add("3week.f");
-            day.add("2week.f");
-            day.add("1week.f");
-            day.add("Recent.f");
+//            day.add("4week.f");
+//            day.add("3week.f");
+//            day.add("2week.f");
+//            day.add("1week.f");
+//            day.add("Recent.f");
 
-            PieData data = new PieData(day, dataSet);
-            data.setValueTextSize(10f);
-            data.setValueTextColor(Color.BLACK);
-            pieChart.setData(data);
-            pieChart.animateXY(100, 100);
-            //색 설정
-            dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+//            LineData data = new LineData(day, dataSet);
+            LineData data = new LineData(day);
+            LineDataSet set = new LineDataSet(GoodBad,"User");
+            set.setColor(Color.BLUE);
+            set.setDrawValues(true);
+            set.setValueTextSize(10);
+            set.setValueTextColor(Color.BLACK);
+            data.addDataSet(set);
 
-            //범주
-            pieChart.setDescription("Compare Graph");
+//            lineChart.animateXY(100, 100);
+//            //색 설정
+//            dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+            LineDataSet set_Friend = new LineDataSet(GoodBad_Friend,"Friend");
+            data.addDataSet(set_Friend);
+            set_Friend.setColor(Color.RED);
+            set_Friend.setDrawValues(true);
+            set_Friend.setValueTextSize(10);
+            set_Friend.setValueTextColor(Color.BLACK);
+            lineChart.setData(data);
+
+            YAxis yAxisRight = lineChart.getAxisRight(); //Y축의 오른쪽면 설정
+            yAxisRight.setDrawLabels(false);
+            yAxisRight.setDrawAxisLine(false);
+            yAxisRight.setDrawGridLines(false);
+
+            lineChart.setDescription("Compare Graph");
+            lineChart.invalidate();
+            //Daily Report 구현_친구와 비교
+            for(int i=0;i<GoodBad.size();i++){
+                sum +=GoodBad.get(i).getVal();
+            }
+            sum=sum/GoodBad.size();
+            for(int i=0;i<GoodBad.size();i++){
+                sumF +=GoodBad_Friend.get(i).getVal();
+            }
+            sumF=sumF/GoodBad_Friend.size();
+
+            //평균값을 친구의 데이터와 비교한다.
+            if(sum<sumF)
+                textView.setText("Ooooops! Your posture is worse than your friend's. You look like a Luigi!");
+            else if(sum==sumF)
+                textView.setText("You are neck and neck with your friend!");
+            else
+                textView.setText("You are better than your friend! Be Proud of that!");
+
         } else {
             //개인측정
+            TextView btn = findViewById(R.id.btn3);
+            btn.setText("MONTHLY REPORT");
             //mysql값을 받아오는 것으로 변경예정
-            ArrayList GoodBad = new ArrayList();
+            ArrayList<Entry> GoodBad = new ArrayList<>();
+
 
             GoodBad.add(new Entry(46f, 0));
             GoodBad.add(new Entry(51f, 1));
             GoodBad.add(new Entry(73f, 2));
             GoodBad.add(new Entry(41f, 3));
             GoodBad.add(new Entry(60f, 4));
-            GoodBad.add(new Entry(69f, 5));
 
-            PieDataSet dataSet = new PieDataSet(GoodBad, "Good Posture");
+
+            LineDataSet dataSet = new LineDataSet(GoodBad, "Good Posture");
             ArrayList day = new ArrayList();
             //x축 기간
-            day.add("5week");
+
             day.add("4week");
             day.add("3week");
             day.add("2week");
@@ -149,15 +206,35 @@ public class MonthActivity extends AppCompatActivity {
             day.add("Recent");
 
 
-            PieData data = new PieData(day, dataSet);
-            data.setValueTextSize(10f);
-            data.setValueTextColor(Color.BLACK);
-            pieChart.setData(data);
-            pieChart.animateXY(100, 100);
-            //색 설정
-            dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-            //범주
-            pieChart.setDescription("Compare Graph");
+//            LineData data = new LineData(day, dataSet);
+            LineData data = new LineData(day);
+            LineDataSet set = new LineDataSet(GoodBad,"User");
+            set.setColor(Color.BLUE);
+            set.setDrawValues(true);
+            set.setValueTextSize(10);
+            set.setValueTextColor(Color.BLACK);
+            data.addDataSet(set);
+            lineChart.setData(data);
+            YAxis yAxisRight = lineChart.getAxisRight(); //Y축의 오른쪽면 설정
+            yAxisRight.setDrawLabels(false);
+            yAxisRight.setDrawAxisLine(false);
+            yAxisRight.setDrawGridLines(false);
+
+            lineChart.setDescription("Compare Graph");
+            lineChart.invalidate();
+            //Daily Report 사용자
+            for(int i=0;i<GoodBad.size();i++){
+                sum +=GoodBad.get(i).getVal();
+            }
+            sum=sum/GoodBad.size();
+
+            //기준값과 사용자의 데이터 비교
+            if(sum<30f)
+                textView.setText("Ooops! Your Posture is quite bad!!");
+            else if(sum<=65f)
+                textView.setText("Well done!! You are like a tree!");
+            else
+                textView.setText("Master of Posture! Your will is like steel!!");
 
         }
     }

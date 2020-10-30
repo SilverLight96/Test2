@@ -95,6 +95,7 @@ public class YearActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.lineChart);
         TextView textView = findViewById(R.id.text1);
         TextView btn = findViewById(R.id.btn3);
+        btn.setText("COMPARE REPORT");
         double sum = 0,sumF=0;
         YAxis leftYAxis = chart.getAxisLeft();
         leftYAxis.setAxisMaxValue(100f);
@@ -144,8 +145,8 @@ public class YearActivity extends AppCompatActivity {
             day.add("Dec");
 
             //그래프 구현
-            LineDataSet lineDataSet=new LineDataSet(GoodBad,"Good Posture");
-            LineDataSet lineDataSet_Friend=new LineDataSet(GoodBad_Friend,"Good Posture_Friend");
+//            LineDataSet lineDataSet=new LineDataSet(GoodBad,"Good Posture");
+//            LineDataSet lineDataSet_Friend=new LineDataSet(GoodBad_Friend,"Good Posture_Friend");
             chart.animateY(100);
 //            LineData data = new LineData(day,lineDataSet);
 //            chart.setData(data);
@@ -156,23 +157,44 @@ public class YearActivity extends AppCompatActivity {
 //            lineDataSet.setValueTextColor(Color.BLACK);
 //            lineDataSet.setHighLightColor(Color.RED);
 //            lineDataSet.setHighlightLineWidth(1.0f);
-            ArrayList<ILineDataSet> lineDataSets=new ArrayList<>();
-            lineDataSets.add(lineDataSet);
-            lineDataSets.add(lineDataSet_Friend);
-            LineData data = new LineData(day, lineDataSet);
-            LineData data2 = new LineData(day,lineDataSet_Friend);
+//            ArrayList<ILineDataSet> lineDataSets=new ArrayList<>();
+//            lineDataSets.add(lineDataSet);
+//            lineDataSets.add(lineDataSet_Friend);
+//            LineData data = new LineData(day, lineDataSet);
+//            LineData data2 = new LineData(day,lineDataSet_Friend);
+//
+//            LineData Data = new LineData(day,lineDataSets);
+//            chart.setData(Data);
+//            lineDataSet.setDrawValues(true);
+//            lineDataSet.setColor(Color.BLUE);
+//            lineDataSet.setValueTextSize(10);
+//            lineDataSet.setValueTextColor(Color.BLACK);
+//
+//            lineDataSet_Friend.setColor(Color.RED);
+//            lineDataSet_Friend.setDrawValues(true);
+//            lineDataSet_Friend.setValueTextSize(10);
+//            lineDataSet_Friend.setValueTextColor(Color.BLACK);
+            LineData data = new LineData(day);
+            LineDataSet set = new LineDataSet(GoodBad,"User");
+            set.setColor(Color.BLUE);
+            set.setDrawValues(true);
+            set.setValueTextSize(10);
+            set.setValueTextColor(Color.BLACK);
+            data.addDataSet(set);
 
-            LineData Data = new LineData(day,lineDataSets);
-            chart.setData(Data);
-            lineDataSet.setDrawValues(true);
-            lineDataSet.setColor(Color.BLUE);
-            lineDataSet.setValueTextSize(10);
-            lineDataSet.setValueTextColor(Color.BLACK);
+            LineDataSet set_Friend = new LineDataSet(GoodBad_Friend,"Friend");
+            data.addDataSet(set_Friend);
+            set_Friend.setColor(Color.RED);
+            set_Friend.setDrawValues(true);
+            set_Friend.setValueTextSize(10);
+            set_Friend.setValueTextColor(Color.BLACK);
+            chart.setData(data);
 
-            lineDataSet_Friend.setColor(Color.RED);
-            lineDataSet_Friend.setDrawValues(true);
-            lineDataSet_Friend.setValueTextSize(10);
-            lineDataSet_Friend.setValueTextColor(Color.BLACK);
+            YAxis yAxisRight = chart.getAxisRight(); //Y축의 오른쪽면 설정
+            yAxisRight.setDrawLabels(false);
+            yAxisRight.setDrawAxisLine(false);
+            yAxisRight.setDrawGridLines(false);
+
             chart.invalidate();
 
             //Daily Report 구현_친구와 비교
@@ -195,7 +217,7 @@ public class YearActivity extends AppCompatActivity {
         }
         else{
             //현재는 임의로 값을 배정, 이후 mysql값을 받아오는 것으로 수정예정
-            btn.setText("DAILY REPORT");
+            btn.setText("ANNUAL REPORT");
             ArrayList<Entry> GoodBad = new ArrayList<>();
 
             GoodBad.add(new Entry(46f,0));
@@ -227,18 +249,33 @@ public class YearActivity extends AppCompatActivity {
             day.add("Nov");
             day.add("Dec");
             //그래프 구현
-            LineDataSet lineDataSet=new LineDataSet(GoodBad,"Good Posture");
-            chart.animateY(100);
-            LineData data = new LineData(day,lineDataSet);
-            chart.setData(data);
-            //lineDataSet.setDrawFilled(true);
-            lineDataSet.setColor(ColorTemplate.getHoloBlue());
-            lineDataSet.setDrawValues(true);
-            lineDataSet.setValueTextSize(10);
-            lineDataSet.setValueTextColor(Color.BLACK);
-            lineDataSet.setHighLightColor(Color.RED);
-            lineDataSet.setHighlightLineWidth(1.0f);
+//            LineDataSet lineDataSet=new LineDataSet(GoodBad,"Good Posture");
+//            chart.animateY(100);
+//            LineData data = new LineData(day,lineDataSet);
+//            chart.setData(data);
+//            //lineDataSet.setDrawFilled(true);
+//            lineDataSet.setColor(ColorTemplate.getHoloBlue());
+//            lineDataSet.setDrawValues(true);
+//            lineDataSet.setValueTextSize(10);
+//            lineDataSet.setValueTextColor(Color.BLACK);
+//            lineDataSet.setHighLightColor(Color.RED);
+//            lineDataSet.setHighlightLineWidth(1.0f);
 
+            LineData data = new LineData(day);
+            LineDataSet set = new LineDataSet(GoodBad,"User");
+            set.setColor(Color.BLUE);
+            set.setDrawValues(true);
+            set.setValueTextSize(10);
+            set.setValueTextColor(Color.BLACK);
+            data.addDataSet(set);
+            chart.setData(data);
+
+            YAxis yAxisRight = chart.getAxisRight(); //Y축의 오른쪽면 설정
+            yAxisRight.setDrawLabels(false);
+            yAxisRight.setDrawAxisLine(false);
+            yAxisRight.setDrawGridLines(false);
+
+            chart.invalidate();
             //Daily Report 사용자
             for(int i=0;i<GoodBad.size();i++){
                 sum +=GoodBad.get(i).getVal();

@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/lineChart"
             android:layout_marginBottom="20dp"
-            android:text="@string/Button3"
+            android:text="@string/Button6"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold" />
         <TextView

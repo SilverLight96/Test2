@@ -50,8 +50,8 @@
         </LinearLayout>
 
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/PieChart"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/LineChart"
             android:layout_width="match_parent"
             android:layout_height="240dp"
             android:layout_below="@+id/layout_statistics1"
@@ -63,9 +63,9 @@
             android:id="@+id/btn3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/PieChart"
+            android:layout_below="@id/LineChart"
             android:layout_marginBottom="20dp"
-            android:text="@string/Button3"
+            android:text="@string/Button5"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold" />
 
@@ -77,7 +77,7 @@
             android:background="#88D1F3"
             android:fontFamily="sans-serif-black"
             android:lineSpacingExtra="8sp"
-            android:text="Your posture of this month was very good. You may be the god of postural correction if you keep doing this?"
+            android:text="It's a normal Posture."
             android:textSize="18sp"
             android:textStyle="bold" />
     </RelativeLayout>

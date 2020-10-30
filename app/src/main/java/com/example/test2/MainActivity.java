@@ -28,6 +28,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.renderer.YAxisRenderer;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import org.w3c.dom.Text;
@@ -172,9 +173,15 @@ public class MainActivity extends AppCompatActivity {
             chart.animateY(100);
             LineData data = new LineData(date,lineDataSet);
             chart.setData(data);
-            lineDataSet.setDrawFilled(true);
+//            lineDataSet.setDrawFilled(true);
             lineDataSet.setColor(ColorTemplate.getHoloBlue());
             lineDataSet.setDrawValues(true);
+
+            YAxis yAxisRight = chart.getAxisRight(); //Y축의 오른쪽면 설정
+            yAxisRight.setDrawLabels(false);
+            yAxisRight.setDrawAxisLine(false);
+            yAxisRight.setDrawGridLines(false);
+
             lineDataSet.setValueTextSize(6);
             lineDataSet.setValueTextColor(Color.BLACK);
             lineDataSet.setHighLightColor(Color.RED);
