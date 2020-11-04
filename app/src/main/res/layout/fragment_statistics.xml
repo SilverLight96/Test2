@@ -57,25 +57,16 @@
                 android:layout_below="@id/layout_statistics1"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/shape_round_skyblue"
-                android:onClick="showDatePicker"
                 android:text="Date Change" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/statistics_textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/layout_statistics1" />
 
         </LinearLayout>
-        <!--        <DatePicker-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:id="@+id/calendar"-->
-        <!--            android:theme="@style/CalenderViewCustom"-->
-        <!--            android:background="@drawable/shape_round_skyblue"-->
-        <!--            android:paddingTop="17dp"-->
-        <!--            android:paddingBottom="0dp"-->
-        <!--            />-->
+
         <TextView
             android:id="@+id/btn1"
             android:layout_width="wrap_content"

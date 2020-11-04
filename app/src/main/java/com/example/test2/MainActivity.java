@@ -1,217 +1,397 @@
 package com.example.test2;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-
-import android.app.DatePickerDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CalendarView;
-import android.widget.DatePicker;
-import android.widget.Spinner;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.renderer.YAxisRenderer;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import org.w3c.dom.Text;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
-import java.text.SimpleDateFormat;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    //Button btnBarChart,btnPieChart;
-//메인화면_통계분석
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle actionBarDrawerToggle;
+    NavigationView drawerNavigationView;
+
+    BottomNavigationView bottomNavigationView;
+
+    ContentsFragment contentsFragment;
+    HomeFragment homeFragment;
+    StatisticsFragment statisticsFragment;
+
+    FragmentManager fragmentManager;
+
+    OptionDialog optionDialog;
+
+    // bluetooth ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    BluetoothAdapter mBluetoothAdapter;
+    Set<BluetoothDevice> mPairedDevices;
+
+    Handler mBluetoothHandler;
+    ConnectedBluetoothThread mThreadConnectedBluetooth;
+    BluetoothDevice mBluetoothDevice;
+    BluetoothSocket mBluetoothSocket;
+
+    final static int BT_REQUEST_ENABLE = 1;
+    final static int BT_MESSAGE_READ = 2;
+    final static int BT_CONNECTING_STATUS = 3;
+    final static UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    // bluetooth ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+    String user_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        //현재 날짜를 출력
-        TextView textView= (TextView)findViewById(R.id.textView);
-        String format =  new String("현재 날짜: "+"yyyy-MM-dd");
-        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.KOREA);
-        textView.setText(sdf.format(new Date()));
+        setContentView(R.layout.layout_drawer);
+        makeDrawerNavigation();
+        optionDialog = new OptionDialog(this);
 
-        //Spinner_선택시 화면 전환
-        final String[] item = getResources().getStringArray(R.array.time);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, item);
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(0, false);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 1) {//Main화면에서 Main화면으로 =>변동없음
-                    Intent I = new Intent(MainActivity.this, MainActivity.class);
-                    startActivity(I);
-                    finish();
-                } else if (position == 2) {//일간으로 이동
-                    Intent I = new Intent(MainActivity.this, DayActivity.class);
-                    startActivity(I);
-                    finish();
-                } else if (position == 3) {//주간으로 이동
-                    Intent I = new Intent(MainActivity.this, WeekActivity.class);
-                    startActivity(I);
-                    finish();
-                } else if (position == 4) {//월간으로 이동
-                    Intent I = new Intent(MainActivity.this, MonthActivity.class);
-                    startActivity(I);
-                    finish();
-                } else if (position == 5) {//연간으로 이동
-                    Intent I = new Intent(MainActivity.this, YearActivity.class);
-                    startActivity(I);
-                    finish();
+        contentsFragment = new ContentsFragment();
+        homeFragment = new HomeFragment(this);
+        statisticsFragment = new StatisticsFragment(this);
+
+        fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.fragment_container, contentsFragment);
+        fragmentTransaction.add(R.id.fragment_container, homeFragment);
+        fragmentTransaction.add(R.id.fragment_container, statisticsFragment);
+        fragmentTransaction.replace(R.id.fragment_container, homeFragment).commit(); // 실행하면 가장 먼저 보이는 화면
+        setTitle(R.string.title_home);
+
+        addBottomTabEvents();
+
+        // bluetooth ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothHandler = new Handler(){
+            public void handleMessage(android.os.Message msg){
+                if(msg.what == BT_MESSAGE_READ){
+                    String readMessage = null;
+                    try {
+                        readMessage = new String((byte[]) msg.obj, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    int x = 0, y = 0;
+                    int middleIndex = 0;
+                    for(int i=0; i<8; i++){
+                        try {
+                            if (readMessage.charAt(i) == '@') {
+                                x = Integer.parseInt(readMessage.substring(0, i));
+                                middleIndex = i + 1;
+                                continue;
+                            }
+                            if (readMessage.charAt(i) == '\n') {
+                                y = Integer.parseInt(readMessage.substring(middleIndex, i - 1));
+                                break;
+                            }
+                        }
+                        catch(NumberFormatException e){
+                            System.out.println("Number Format exception");
+                        }
+                    }
+//                    homeFragment.setPostureData("x축 : "+x+"\ny축 : "+y);
+                    homeFragment.setAvatarAngle(y, x);
+//                    System.out.println(x +"/"+y);
                 }
             }
+        };
+        // bluetooth ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
+        // LoginActivity로부터 로그인 시 유저 아이디를 받아옴
+        Bundle extras = getIntent().getExtras();
+        user_id = extras.getString("user_id");
+    }
+
+    private void addBottomTabEvents() {
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
+        bottomNavigationView.setSelectedItemId(R.id.home_menu);
+        findViewById(R.id.contents_menu).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public void onClick(View v) {
+                bottomNavigationView.setSelectedItemId(R.id.contents_menu);
+                setTitle(R.string.title_contents);
+                fragmentManager.beginTransaction().replace(R.id.fragment_container, contentsFragment).commit();
             }
         });
-
-    }
-    public void showDatePicker(View view){
-        DialogFragment newFragment = new DatePickerFragment();
-        newFragment.show(getSupportFragmentManager(),"datePicker");
-    }
-    public void processDatePickerResult(int year,int month,int day){
-        LineChart chart = findViewById(R.id.lineChart);
-        YAxis leftYAxis = chart.getAxisLeft();
-        leftYAxis.setAxisMaxValue(100f);
-        // todo
-        //예시: month는 +1을 더해준다
-        //이후 날짜 데이터를 받아오면 쓰일 예정
-        //현재 날짜 출력
-        TextView textView= (TextView)findViewById(R.id.textView);
-        TextView text1 = (TextView) findViewById(R.id.text1);
-        double sum=0;
-        String format =  new String("Current Date: yyyy-MM-dd");
-        textView.setText("Current Date: "+year+"-"+(month+1)+"-"+day);
-        if(year==2020&&month==9&&day==24) {
-//                    Intent intent = new Intent(MainActivity.this, DayActivity.class);
-//                    startActivity(intent);
-            //현재는 임의로 값을 배정, 이후 mysql값을 받아오는 것으로 수정예정
-
-            ArrayList<Entry> GoodBad = new ArrayList<>();
-
-            GoodBad.add(new BarEntry(0f,0));
-            GoodBad.add(new BarEntry(0f,1));
-            GoodBad.add(new BarEntry(0f,2));
-            GoodBad.add(new BarEntry(0f,3));
-            GoodBad.add(new BarEntry(0f,4));
-            GoodBad.add(new BarEntry(0f,5));
-            GoodBad.add(new BarEntry(46f,6));
-            GoodBad.add(new BarEntry(46f,7));
-            GoodBad.add(new BarEntry(51f,8));
-            GoodBad.add(new BarEntry(73f,9));
-            GoodBad.add(new BarEntry(41f,10));
-            GoodBad.add(new BarEntry(60f,11));
-            GoodBad.add(new BarEntry(69f,12));
-            GoodBad.add(new BarEntry(69f,13));
-            GoodBad.add(new BarEntry(69f,14));
-            GoodBad.add(new BarEntry(0f,15));
-            GoodBad.add(new BarEntry(0f,16));
-            GoodBad.add(new BarEntry(0f,17));
-            GoodBad.add(new BarEntry(45f,18));
-            GoodBad.add(new BarEntry(40f,19));
-            GoodBad.add(new BarEntry(50f,20));
-            GoodBad.add(new BarEntry(0f,21));
-            GoodBad.add(new BarEntry(0f,22));
-            GoodBad.add(new BarEntry(0f,23));
-
-            //x축, 시간
-            ArrayList<String> date = new ArrayList<>();
-
-            date.add("0am");
-            date.add("1am");
-            date.add("2am");
-            date.add("3am");
-            date.add("4am");
-            date.add("5am");
-            date.add("6am");
-            date.add("7am");
-            date.add("8am");
-            date.add("9am");
-            date.add("10am");
-            date.add("11am");
-            date.add("12pm");
-            date.add("13pm");
-            date.add("14pm");
-            date.add("15pm");
-            date.add("16pm");
-            date.add("17pm");
-            date.add("18pm");
-            date.add("19pm");
-            date.add("20pm");
-            date.add("21pm");
-            date.add("22pm");
-            date.add("23pm");
-
-            //그래프 구현
-            LineDataSet lineDataSet=new LineDataSet(GoodBad,"Good Posture");
-            chart.animateY(100);
-            LineData data = new LineData(date,lineDataSet);
-            chart.setData(data);
-//            lineDataSet.setDrawFilled(true);
-            lineDataSet.setColor(ColorTemplate.getHoloBlue());
-            lineDataSet.setDrawValues(true);
-
-            YAxis yAxisRight = chart.getAxisRight(); //Y축의 오른쪽면 설정
-            yAxisRight.setDrawLabels(false);
-            yAxisRight.setDrawAxisLine(false);
-            yAxisRight.setDrawGridLines(false);
-
-            lineDataSet.setValueTextSize(6);
-            lineDataSet.setValueTextColor(Color.BLACK);
-            lineDataSet.setHighLightColor(Color.RED);
-            lineDataSet.setHighlightLineWidth(1.0f);
-
-            //Daily Report 사용자
-            //사용자의 기록이 0인 경우를 제외하고 평균을 구한다.
-            int count =0;
-            for(int i=0;i<GoodBad.size();i++){
-                sum +=GoodBad.get(i).getVal();
-                if (GoodBad.get(i).getVal()!=0f) {
-                    count=count+1;
-                }
+        findViewById(R.id.home_menu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomNavigationView.setSelectedItemId(R.id.home_menu);
+                setTitle(R.string.title_home);
+                fragmentManager.beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
             }
-            sum=sum/count;
+        });
+        findViewById(R.id.statistics_menu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomNavigationView.setSelectedItemId(R.id.statistics_menu);
+                setTitle(R.string.title_statistics);
+                fragmentManager.beginTransaction().replace(R.id.fragment_container, statisticsFragment).commit();
+            }
+        });
+    }
 
-            //기준값과 사용자의 데이터 비교
-            if(sum<30f)
-                text1.setText("Ooops! Your Posture is quite bad!!");
-            else if(sum<=65f)
-                text1.setText("Well done!! You are like a tree!");
-            else
-                text1.setText("Master of Posture! Your will is like steel!!");
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_toolbar_button, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(actionBarDrawerToggle.onOptionsItemSelected(item))
+            return true;
+
+        if (id == R.id.bluetooth_menu) {
+            if(mBluetoothAdapter.isEnabled()) bluetoothOff();
+            else bluetoothOn();
+            return true;
+        }
+        if (id == R.id.option_menu) {
+            optionDialog.show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void onBackPressed() { // close navigation automatically when 'back' is pressed
+        // TODO Auto-generated method stub
+        if(drawerLayout.isDrawerOpen(Gravity.LEFT)){
+            drawerLayout.closeDrawer(Gravity.LEFT);
         }
         else{
-
-            chart.clear();
-            chart.setNoDataText("There's no record of this day.");
-            text1.setText("There's no evaluate of this day.");
-
+            super.onBackPressed();
         }
     }
+
+    private void makeDrawerNavigation(){
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout_id);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        drawerNavigationView = (NavigationView)findViewById(R.id.navigation_view);
+        drawerNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch(id)
+                {
+                    case R.id.profile_menu:
+                        startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                        break;
+                    case R.id.device_information_menu:
+                        startActivity(new Intent(MainActivity.this, DeviceInformationActivity.class));
+                        break;
+                    case R.id.instruction_menu:
+                        startActivity(new Intent(MainActivity.this, InstructionActivity.class));
+                        break;
+                    case R.id.customer_service_menu:
+                        startActivity(new Intent(MainActivity.this, CustomerServiceActivity.class));
+                        break;
+                    case R.id.friend_menu:
+                        Intent intent = new Intent(MainActivity.this, FriendActivity.class);
+                        intent.putExtra("user_id", user_id);
+                        startActivity(intent);
+                        break;
+                    case R.id.log_out_menu:
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
+                        break;
+                    default:
+                        return true;
+                }
+                drawerLayout.closeDrawer(Gravity.LEFT); // close navigation automatically when a menue is clicked
+                return true;
+            }
+        });
+    }
+
+    private void makeToast(String string){
+        Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
+    }
+
+    // bluetooth ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+    void bluetoothOn() {
+        if(mBluetoothAdapter == null) {
+            Toast.makeText(getApplicationContext(), "블루투스를 지원하지 않는 기기입니다.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            if (mBluetoothAdapter.isEnabled()) {
+                Toast.makeText(getApplicationContext(), "블루투스가 이미 활성화 되어 있습니다.", Toast.LENGTH_SHORT).show();
+//                mTvBluetoothStatus.setText("활성화");
+            }
+            else {
+//                Toast.makeText(getApplicationContext(), "블루투스가 활성화 되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
+                Intent intentBluetoothEnable = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(intentBluetoothEnable, BT_REQUEST_ENABLE);
+            }
+        }
+    }
+    void bluetoothOff() {
+        if (mBluetoothAdapter.isEnabled()) {
+            mBluetoothAdapter.disable();
+            Toast.makeText(getApplicationContext(), "블루투스가 비활성화 되었습니다.", Toast.LENGTH_SHORT).show();
+//            mTvBluetoothStatus.setText("비활성화");
+
+            homeFragment.setState0();
+        }
+        else {
+//            Toast.makeText(getApplicationContext(), "블루투스가 이미 비활성화 되어 있습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case BT_REQUEST_ENABLE:
+                if (resultCode == RESULT_OK) { // 블루투스 활성화를 확인을 클릭하였다면
+                    Toast.makeText(getApplicationContext(), "블루투스가 활성화 되었습니다.", Toast.LENGTH_SHORT).show();
+//                    mTvBluetoothStatus.setText("활성화");
+                } else if (resultCode == RESULT_CANCELED) { // 블루투스 활성화를 취소를 클릭하였다면
+//                    Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_SHORT).show();
+//                    mTvBluetoothStatus.setText("비활성화");
+
+                    homeFragment.setState0();
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+    void listPairedDevices() {
+        if (mBluetoothAdapter.isEnabled()) { // 블루투스가 켜져있으면
+            mPairedDevices = mBluetoothAdapter.getBondedDevices(); // 페어링 가능한 모든 블루투스 장치들을 리턴
+            if (mPairedDevices.size() > 0) { // 페어링 가능한 장치가 하나라도 있으면
+                // 페어링 가능한 모든 장치의 목록을 띄움
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("장치 선택");
+
+                ArrayList<String> mListPairedDevices = new ArrayList<String>();
+                for (BluetoothDevice device : mPairedDevices) {
+                    mListPairedDevices.add(device.getName());
+                    //mListPairedDevices.add(device.getName() + "\n" + device.getAddress());
+                }
+                final CharSequence[] items = mListPairedDevices.toArray(new CharSequence[mListPairedDevices.size()]);
+                mListPairedDevices.toArray(new CharSequence[mListPairedDevices.size()]);
+
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        connectSelectedDevice(items[item].toString());
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+//                connectSelectedDevice("HC-06");
+            }
+            else { // 페어링 가능한 장치가 하나도 없으면
+                Toast.makeText(getApplicationContext(), "페어링된 장치가 없습니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else { // 블루투스가 꺼져있으면
+            Toast.makeText(getApplicationContext(), "블루투스가 비활성화 되어 있습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    void connectSelectedDevice(String selectedDeviceName) {
+//        Log.d("ABCD","waiting");
+        for(BluetoothDevice tempDevice : mPairedDevices) {
+            if (selectedDeviceName.equals(tempDevice.getName())) {
+//                Log.d("ABCD","same");
+                mBluetoothDevice = tempDevice;
+                break;
+            }
+        }
+        try {
+            mBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(BT_UUID);
+            mBluetoothSocket.connect();
+            makeToast("기기와 연결되었습니다.");
+            mThreadConnectedBluetooth = new ConnectedBluetoothThread(mBluetoothSocket);
+            mThreadConnectedBluetooth.start();
+            mBluetoothHandler.obtainMessage(BT_CONNECTING_STATUS, 1, -1).sendToTarget();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "기기와 연결을 실패했습니다.", Toast.LENGTH_SHORT).show();
+            homeFragment.setState0();
+        }
+    }
+
+    public class ConnectedBluetoothThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final InputStream mmInStream;
+        private final OutputStream mmOutStream;
+
+        public ConnectedBluetoothThread(BluetoothSocket socket) {
+            mmSocket = socket;
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
+
+            try {
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
+            } catch (IOException e) {
+                Toast.makeText(getApplicationContext(), "소켓 연결 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+            }
+
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+        }
+        public void run() {
+            byte[] buffer = new byte[1024];
+            int bytes;
+
+            while (true) {
+                try {
+                    bytes = mmInStream.available();
+                    if (bytes != 0) {
+                        SystemClock.sleep(100);
+                        bytes = mmInStream.available();
+                        bytes = mmInStream.read(buffer, 0, bytes);
+                        mBluetoothHandler.obtainMessage(BT_MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                    }
+                } catch (IOException e) {
+                    break;
+                }
+            }
+        }
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+//                Toast.makeText(getApplicationContext(), "소켓 해제 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    // bluetooth ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
 }

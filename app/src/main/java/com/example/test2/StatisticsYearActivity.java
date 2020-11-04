@@ -8,32 +8,29 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
-//일간 그래프(꺽은선 그래프)
-public class DayActivity extends AppCompatActivity {
+//연간 그래프
+public class StatisticsYearActivity extends AppCompatActivity {
     //Button btnBarChart,btnPieChart;
-    Switch sw;
     Spinner spinner;
+    Switch sw;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_day);
-        //BarChart barChart=(BarChart) findViewById(R.id.barChart);
+        setContentView(R.layout.activity_year);
         LineChart chart = findViewById(R.id.lineChart);
+        YAxis leftYAxis = chart.getAxisLeft();
+        leftYAxis.setAxisMaxValue(100f);
 
         sw=(Switch)findViewById(R.id.switch1);
         CheckState();
@@ -45,42 +42,39 @@ public class DayActivity extends AppCompatActivity {
         });
 
 
-
         //Spinner_선택시 화면 전환
         final String[] item = getResources().getStringArray(R.array.time);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, item);
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(adapter);
-        spinner.setSelection(0,false);
+        spinner.setSelection(5,false);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if(position==1){//Main화면에서 Main화면으로 =>변동없음
-                        Intent I = new Intent(DayActivity.this, MainActivity.class);
-                        startActivity(I);
-                        finish();
-                    }
-                    else if(position==2){//일간으로 이동
-                        Intent I = new Intent(DayActivity.this, DayActivity.class);
-                        startActivity(I);
-                        finish();
-                    }
-                    else if(position==3){//주간으로 이동
-                        Intent I = new Intent(DayActivity.this, WeekActivity.class);
-                        startActivity(I);
-                        finish();
-                    }
-                    else if(position==4){//월간으로 이동
-                        Intent I = new Intent(DayActivity.this, MonthActivity.class);
-                        startActivity(I);
-                        finish();
-                    }
-                    else if (position == 5) {//연간으로 이동
-                        Intent I = new Intent(DayActivity.this, YearActivity.class);
-                        startActivity(I);
-                        finish();
-                    }
+                if(position==1){//메인화면
+                    finish();
                 }
+                else if(position==2){//일간
+                    Intent I = new Intent(StatisticsYearActivity.this, StatisticsDayActivity.class);
+                    startActivity(I);
+                    finish();
+                }
+                else if(position==3){//주간이동
+                    Intent I = new Intent(StatisticsYearActivity.this, StatisticsWeekActivity.class);
+                    startActivity(I);
+                    finish();
+                }
+                else if(position==4){//월간이동
+                    Intent I = new Intent(StatisticsYearActivity.this, StatisticsMonthActivity.class);
+                    startActivity(I);
+                    finish();
+                }
+                else if (position == 5) {//연간으로 이동
+                    Intent I = new Intent(StatisticsYearActivity.this, StatisticsYearActivity.class);
+                    startActivity(I);
+                    finish();
+                }
+            }
 
 
             @Override
@@ -89,17 +83,17 @@ public class DayActivity extends AppCompatActivity {
             }
         });
 
+
     }
     private void CheckState() {
         LineChart chart = findViewById(R.id.lineChart);
         TextView textView = findViewById(R.id.text1);
         TextView btn = findViewById(R.id.btn3);
+        btn.setText("COMPARE REPORT");
         double sum = 0,sumF=0;
         YAxis leftYAxis = chart.getAxisLeft();
         leftYAxis.setAxisMaxValue(100f);
-        if (sw.isChecked()){
-            //현재는 임의로 값을 배정, 이후 mysql값을 받아오는 것으로 수정예정
-            btn.setText("COMPARE REPORT");
+        if (sw.isChecked()) {
             ArrayList<Entry> GoodBad = new ArrayList<>();
             ArrayList<Entry> GoodBad_Friend = new ArrayList<>();
 
@@ -109,6 +103,12 @@ public class DayActivity extends AppCompatActivity {
             GoodBad.add(new Entry(41f,3));
             GoodBad.add(new Entry(60f,4));
             GoodBad.add(new Entry(69f,5));
+            GoodBad.add(new Entry(72f,6));
+            GoodBad.add(new Entry(74f,7));
+            GoodBad.add(new Entry(70f,8));
+            GoodBad.add(new Entry(69f,9));
+            GoodBad.add(new Entry(0f,10));
+            GoodBad.add(new Entry(0f,11));
 
             GoodBad_Friend.add(new Entry(51f,0));
             GoodBad_Friend.add(new Entry(56f,1));
@@ -116,23 +116,41 @@ public class DayActivity extends AppCompatActivity {
             GoodBad_Friend.add(new Entry(46f,3));
             GoodBad_Friend.add(new Entry(65f,4));
             GoodBad_Friend.add(new Entry(74f,5));
-
+            GoodBad_Friend.add(new Entry(72f,6));
+            GoodBad_Friend.add(new Entry(70f,7));
+            GoodBad_Friend.add(new Entry(75f,8));
+            GoodBad_Friend.add(new Entry(60f,9));
+            GoodBad_Friend.add(new Entry(30f,10));
+            GoodBad_Friend.add(new Entry(30f,11));
             //x축, 시간
-            ArrayList<String> day = new ArrayList<>();
+            ArrayList day = new ArrayList();
 
-            day.add("1pm");
-            day.add("2pm");
-            day.add("3pm");
-            day.add("4pm");
-            day.add("5pm");
-            day.add("6pm");
+            day.add("Jan");
+            day.add("Feb");
+            day.add("Mar");
+            day.add("Apr");
+            day.add("May");
+            day.add("Jun");
+            day.add("Jul");
+            day.add("Aug");
+            day.add("Seb");
+            day.add("Oct");
+            day.add("Nov");
+            day.add("Dec");
 
+            //그래프 구현
 //            LineDataSet lineDataSet=new LineDataSet(GoodBad,"Good Posture");
 //            LineDataSet lineDataSet_Friend=new LineDataSet(GoodBad_Friend,"Good Posture_Friend");
             chart.animateY(100);
-
-
-            //그래프 구현
+//            LineData data = new LineData(day,lineDataSet);
+//            chart.setData(data);
+//            lineDataSet.setDrawFilled(true);
+//            lineDataSet.setColor(ColorTemplate.getHoloBlue());
+//            lineDataSet.setDrawValues(true);
+//            lineDataSet.setValueTextSize(10);
+//            lineDataSet.setValueTextColor(Color.BLACK);
+//            lineDataSet.setHighLightColor(Color.RED);
+//            lineDataSet.setHighlightLineWidth(1.0f);
 //            ArrayList<ILineDataSet> lineDataSets=new ArrayList<>();
 //            lineDataSets.add(lineDataSet);
 //            lineDataSets.add(lineDataSet_Friend);
@@ -150,7 +168,6 @@ public class DayActivity extends AppCompatActivity {
 //            lineDataSet_Friend.setDrawValues(true);
 //            lineDataSet_Friend.setValueTextSize(10);
 //            lineDataSet_Friend.setValueTextColor(Color.BLACK);
-
             LineData data = new LineData(day);
             LineDataSet set = new LineDataSet(GoodBad,"User");
             set.setColor(Color.BLUE);
@@ -159,7 +176,7 @@ public class DayActivity extends AppCompatActivity {
             set.setValueTextColor(Color.BLACK);
             data.addDataSet(set);
 
-            LineDataSet set_Friend = new LineDataSet(GoodBad_Friend,"practice");
+            LineDataSet set_Friend = new LineDataSet(GoodBad_Friend,"Friend");
             data.addDataSet(set_Friend);
             set_Friend.setColor(Color.RED);
             set_Friend.setDrawValues(true);
@@ -173,6 +190,7 @@ public class DayActivity extends AppCompatActivity {
             yAxisRight.setDrawGridLines(false);
 
             chart.invalidate();
+
             //Daily Report 구현_친구와 비교
             for(int i=0;i<GoodBad.size();i++){
                 sum +=GoodBad.get(i).getVal();
@@ -182,7 +200,7 @@ public class DayActivity extends AppCompatActivity {
                 sumF +=GoodBad_Friend.get(i).getVal();
             }
             sumF=sumF/GoodBad_Friend.size();
-            
+
             //평균값을 친구의 데이터와 비교한다.
             if(sum<sumF)
                 textView.setText("Ooooops! Your posture is worse than your friend's. You look like a Luigi!");
@@ -193,42 +211,52 @@ public class DayActivity extends AppCompatActivity {
         }
         else{
             //현재는 임의로 값을 배정, 이후 mysql값을 받아오는 것으로 수정예정
-            btn.setText("DAILY REPORT");
+            btn.setText("ANNUAL REPORT");
             ArrayList<Entry> GoodBad = new ArrayList<>();
 
-            GoodBad.add(new BarEntry(46f,0));
-            GoodBad.add(new BarEntry(51f,1));
-            GoodBad.add(new BarEntry(73f,2));
-            GoodBad.add(new BarEntry(41f,3));
-            GoodBad.add(new BarEntry(60f,4));
-            GoodBad.add(new BarEntry(69f,5));
+            GoodBad.add(new Entry(46f,0));
+            GoodBad.add(new Entry(51f,1));
+            GoodBad.add(new Entry(73f,2));
+            GoodBad.add(new Entry(41f,3));
+            GoodBad.add(new Entry(60f,4));
+            GoodBad.add(new Entry(69f,5));
+            GoodBad.add(new Entry(72f,6));
+            GoodBad.add(new Entry(74f,7));
+            GoodBad.add(new Entry(70f,8));
+            GoodBad.add(new Entry(69f,9));
+            GoodBad.add(new Entry(0f,10));
+            GoodBad.add(new Entry(0f,11));
 
             //x축, 시간
-            ArrayList<String> day = new ArrayList<>();
+            ArrayList day = new ArrayList();
 
-            day.add("1pm");
-            day.add("2pm");
-            day.add("3pm");
-            day.add("4pm");
-            day.add("5pm");
-            day.add("6pm");
-
+            day.add("Jan");
+            day.add("Feb");
+            day.add("Mar");
+            day.add("Apr");
+            day.add("May");
+            day.add("Jun");
+            day.add("Jul");
+            day.add("Aug");
+            day.add("Seb");
+            day.add("Oct");
+            day.add("Nov");
+            day.add("Dec");
             //그래프 구현
 //            LineDataSet lineDataSet=new LineDataSet(GoodBad,"Good Posture");
 //            chart.animateY(100);
 //            LineData data = new LineData(day,lineDataSet);
 //            chart.setData(data);
-//           // lineDataSet.setDrawFilled(true);
+//            //lineDataSet.setDrawFilled(true);
 //            lineDataSet.setColor(ColorTemplate.getHoloBlue());
 //            lineDataSet.setDrawValues(true);
 //            lineDataSet.setValueTextSize(10);
-//            lineDataSet.setColor(Color.BLUE);
 //            lineDataSet.setValueTextColor(Color.BLACK);
 //            lineDataSet.setHighLightColor(Color.RED);
 //            lineDataSet.setHighlightLineWidth(1.0f);
-            chart.animateY(100);
+
             LineData data = new LineData(day);
-            LineDataSet set = new LineDataSet(GoodBad,"Friend");
+            LineDataSet set = new LineDataSet(GoodBad,"User");
             set.setColor(Color.BLUE);
             set.setDrawValues(true);
             set.setValueTextSize(10);
@@ -240,7 +268,6 @@ public class DayActivity extends AppCompatActivity {
             yAxisRight.setDrawLabels(false);
             yAxisRight.setDrawAxisLine(false);
             yAxisRight.setDrawGridLines(false);
-
 
             chart.invalidate();
             //Daily Report 사용자

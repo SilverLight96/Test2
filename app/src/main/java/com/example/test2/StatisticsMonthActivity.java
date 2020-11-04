@@ -13,24 +13,17 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
-
-import static android.graphics.Color.BLUE;
-import static android.graphics.Color.RED;
 
 //월간 그래프
 //기존: 원형그래프였으나 수정필요
 //대체: 꺾은선 그래프로 임시조치 Piechart->Linechart
-public class MonthActivity extends AppCompatActivity {
+public class StatisticsMonthActivity extends AppCompatActivity {
     Switch sw;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +36,7 @@ public class MonthActivity extends AppCompatActivity {
 
         sw.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-             CheckState();
+                CheckState();
             }
         });
 
@@ -53,32 +46,30 @@ public class MonthActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, item);
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(adapter);
-        spinner.setSelection(0,false);
+        spinner.setSelection(4,false);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position==1){//월간->메인
-                    Intent I = new Intent(MonthActivity.this, MainActivity.class);
-                    startActivity(I);
                     finish();
                 }
                 else if(position==2){//월간->일간
-                    Intent I = new Intent(MonthActivity.this, DayActivity.class);
+                    Intent I = new Intent(StatisticsMonthActivity.this, StatisticsDayActivity.class);
                     startActivity(I);
                     finish();
                 }
                 else if(position==3){//주간
-                    Intent I = new Intent(MonthActivity.this, WeekActivity.class);
+                    Intent I = new Intent(StatisticsMonthActivity.this, StatisticsWeekActivity.class);
                     startActivity(I);
                     finish();
                 }
                 else if(position==4){//월간
-                    Intent I = new Intent(MonthActivity.this, MonthActivity.class);
+                    Intent I = new Intent(StatisticsMonthActivity.this, StatisticsMonthActivity.class);
                     startActivity(I);
                     finish();
                 }
                 else if (position == 5) {//연간으로 이동
-                    Intent I = new Intent(MonthActivity.this, YearActivity.class);
+                    Intent I = new Intent(StatisticsMonthActivity.this, StatisticsYearActivity.class);
                     startActivity(I);
                     finish();
                 }

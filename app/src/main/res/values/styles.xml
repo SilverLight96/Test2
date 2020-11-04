@@ -1,15 +1,4 @@
-<!--<resources>-->
-<!--    &lt;!&ndash; Base application theme. &ndash;&gt;-->
-<!--    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
-<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
-<!--        <item name="colorPrimary">@color/colorPrimary</item>-->
-<!--        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
-<!--        <item name="colorAccent">@color/colorAccent</item>-->
-<!--    </style>-->
-
-<!--</resources>-->
-
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -18,17 +7,28 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="CalenderViewCustom" parent="android:TextAppearance.DeviceDefault.Medium">
-        <item name="colorAccent">@color/selected</item>
-        <item name="colorPrimary">@android:color/darker_gray</item>
-        <item name="android:textColorPrimary">@color/brown</item>
-    </style>
-
-    <style name="CalenderViewDateCustomText" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:textColor">@color/brown</item>
-    </style>
-
-    <style name="CalenderViewWeekCustomText" parent="TextAppearance.AppCompat.Subhead">
-        <item name="android:textColor">@color/brown</item>
-    </style>
 </resources>
+
+<!--<resources xmlns:tools="http://schemas.android.com/tools">-->
+<!--    &lt;!&ndash; Base application theme. &ndash;&gt;-->
+<!--    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/colorPrimary</item>-->
+<!--        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+<!--        <item name="colorAccent">@color/colorAccent</item>-->
+<!--    </style>-->
+
+<!--    <style name="CalenderViewCustom" parent="android:TextAppearance.DeviceDefault.Medium">-->
+<!--        <item name="colorAccent">@color/selected</item>-->
+<!--        <item name="colorPrimary">@android:color/darker_gray</item>-->
+<!--        <item name="android:textColorPrimary">@color/brown</item>-->
+<!--    </style>-->
+
+<!--    <style name="CalenderViewDateCustomText" parent="Widget.AppCompat.Button.Borderless">-->
+<!--        <item name="android:textColor">@color/brown</item>-->
+<!--    </style>-->
+
+<!--    <style name="CalenderViewWeekCustomText" parent="TextAppearance.AppCompat.Subhead">-->
+<!--        <item name="android:textColor">@color/brown</item>-->
+<!--    </style>-->
+<!--</resources>-->

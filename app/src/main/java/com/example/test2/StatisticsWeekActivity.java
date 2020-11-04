@@ -17,7 +17,7 @@ import com.github.mikephil.charting.data.BarEntry;
 
 import java.util.ArrayList;
 //주간_막대그래프
-public class WeekActivity extends AppCompatActivity {
+public class StatisticsWeekActivity extends AppCompatActivity {
 
     BarChart stackedChart;
     int[] colorArray=new int[]{Color.BLUE,Color.RED};
@@ -65,32 +65,30 @@ public class WeekActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, item);
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(adapter);
-        spinner.setSelection(0,false);
+        spinner.setSelection(3,false);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position==1){//메인화면
-                    Intent I = new Intent(WeekActivity.this, MainActivity.class);
-                    startActivity(I);
                     finish();
                 }
                 else if(position==2){//일간
-                    Intent I = new Intent(WeekActivity.this, DayActivity.class);
+                    Intent I = new Intent(StatisticsWeekActivity.this, StatisticsDayActivity.class);
                     startActivity(I);
                     finish();
                 }
                 else if(position==3){//주간으로 이동
-                    Intent I = new Intent(WeekActivity.this, WeekActivity.class);
+                    Intent I = new Intent(StatisticsWeekActivity.this, StatisticsWeekActivity.class);
                     startActivity(I);
                     finish();
                 }
                 else if(position==4){//월간으로 이동
-                    Intent I = new Intent(WeekActivity.this,MonthActivity.class);
+                    Intent I = new Intent(StatisticsWeekActivity.this, StatisticsMonthActivity.class);
                     startActivity(I);
                     finish();
                 }
                 else if (position == 5) {//연간으로 이동
-                    Intent I = new Intent(WeekActivity.this, YearActivity.class);
+                    Intent I = new Intent(StatisticsWeekActivity.this, StatisticsYearActivity.class);
                     startActivity(I);
                     finish();
                 }
