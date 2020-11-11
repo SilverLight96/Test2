@@ -5,9 +5,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -60,10 +63,10 @@ public class MainActivity extends AppCompatActivity {
     final static int BT_REQUEST_ENABLE = 1;
     final static int BT_MESSAGE_READ = 2;
     final static int BT_CONNECTING_STATUS = 3;
-    final static UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    final static UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     // bluetooth ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-    String user_id;
+    public String user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
                             System.out.println("Number Format exception");
                         }
                     }
-//                    homeFragment.setPostureData("x축 : "+x+"\ny축 : "+y);
+                    homeFragment.setPostureData("x축 : "+x+"\ny축 : "+y);
                     homeFragment.setAvatarAngle(y, x);
-//                    System.out.println(x +"/"+y);
+                    System.out.println(x +"/"+y);
                 }
             }
         };
@@ -153,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 bottomNavigationView.setSelectedItemId(R.id.statistics_menu);
                 setTitle(R.string.title_statistics);
                 fragmentManager.beginTransaction().replace(R.id.fragment_container, statisticsFragment).commit();
+                statisticsFragment.user_id = user_id;
             }
         });
     }
@@ -321,7 +325,17 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "블루투스가 비활성화 되어 있습니다.", Toast.LENGTH_SHORT).show();
         }
     }
-
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
+        if(Build.VERSION.SDK_INT >= 10){
+            try {
+                final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord",
+                        new Class[] { UUID.class });
+                return (BluetoothSocket) m.invoke(device, BT_UUID);
+            }
+            catch (Exception e) {
+                Log.e("TAG", "Could not create Insecure RFComm Connection",e); } }
+        return device.createRfcommSocketToServiceRecord(BT_UUID);
+    }
     void connectSelectedDevice(String selectedDeviceName) {
 //        Log.d("ABCD","waiting");
         for(BluetoothDevice tempDevice : mPairedDevices) {
@@ -333,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
         }
         try {
             mBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(BT_UUID);
+            //mBluetoothSocket = createBluetoothSocket(mBluetoothDevice);
             mBluetoothSocket.connect();
             makeToast("기기와 연결되었습니다.");
             mThreadConnectedBluetooth = new ConnectedBluetoothThread(mBluetoothSocket);
@@ -368,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             byte[] buffer = new byte[1024];
             int bytes;
-
+            System.out.println("----------------------");
             while (true) {
                 try {
                     bytes = mmInStream.available();
