@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.layout_drawer);
         makeDrawerNavigation();
         optionDialog = new OptionDialog(this);
-
         contentsFragment = new ContentsFragment();
         homeFragment = new HomeFragment(this);
         statisticsFragment = new StatisticsFragment(this);

@@ -29,6 +29,7 @@
             </TextView>
 
             <HorizontalScrollView
+                android:id="@+id/horizontal_View"
                 android:layout_width="wrap_content"
                 android:layout_height="277dp"
                 android:scrollbarThumbHorizontal="@null">
@@ -64,13 +65,20 @@
                             <!--                                android:id="@+id/image4"-->
                             <!--                                android:src="@drawable/contentpicture1">-->
                             <!--                         </ImageView>-->
-                            <kr.co.prnd.YouTubePlayerView
-                                android:id="@+id/youtubeView"
-                                android:layout_width="344dp"
-                                android:layout_height="200dp"
-                                app:fragment="com.example.test2.ContentsFragment"
-                                app:videoId="qMtyhDDmJ-U" />
+<!--                            <kr.co.prnd.YouTubePlayerView-->
+<!--                                android:id="@+id/youtubeView"-->
+<!--                                android:layout_width="344dp"-->
+<!--                                android:layout_height="200dp"-->
+<!--                                app:fragment="com.example.test2.ContentsFragment"-->
+<!--                                app:videoId="qMtyhDDmJ-U" />-->
 
+                            <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+                                android:id="@+id/card_content_player_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
                                 android:layout_width="wrap_content"
