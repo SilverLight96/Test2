@@ -43,8 +43,8 @@ public class ContentsFragment extends Fragment {
         contents.add(new YouTubeContent("Io5NYpzfsEU"));
         //[후기]5분만에 라운드 숄더, 굽은등 펴기
         contents.add(new YouTubeContent("tzJbwflDPhY"));
-        TextView text1=(TextView)textview.findViewById(R.id.textView2);
-        text1.setText(text.get(2));
+//        TextView text1=(TextView)textview.findViewById(R.id.textView2);
+//        text1.setText(text.get(2));
         //textView.setText(text.get(2));
 //        CardView cardView= (CardView)rootview.findViewById(R.id.card_you_tube_content);
 

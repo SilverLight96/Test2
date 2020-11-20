@@ -317,10 +317,21 @@ public class StatisticsFragment extends Fragment {
 
                 for(int i=0; i<jsonResult.length(); i++){
                     JSONObject parsedResult = new JSONObject(jsonResult.getString(i));
-                    string += "<"+key+" = "+parsedResult.getString(key)+">\n";
-                    string += "LR = "+parsedResult.getString("AVG(LR)")+"\n";
-                    string += "FB = "+parsedResult.getString("AVG(FB)")+"\n";
+//                    string += "<"+key+" = "+parsedResult.getString(key)+">\n";
+//                    string += "LR = "+parsedResult.getString("AVG(LR)")+"\n";
+//                    string += "FB = "+parsedResult.getString("AVG(FB)")+"\n";
+                    string += parsedResult.getString(key);
+                    try {
+                        Double d1 = Double.parseDouble(parsedResult.getString("AVG(LR)"));
+                        Double d2 = Double.parseDouble(parsedResult.getString("AVG(FB)"));
+                        int d = (int) (d1 + d2) / 2;
+                        string += d;
+                        //string+int+string+int....형태가 된다.
+                    }catch(JSONException e){
+                        e.printStackTrace();
+                    }
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
