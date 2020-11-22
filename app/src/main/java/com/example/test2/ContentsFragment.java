@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.ListFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,12 +31,13 @@ public class ContentsFragment extends Fragment {
     View rootview;
     View textview;
     Context context;
+//    ListView list;
     YouTubePlayer.OnInitializedListener listener;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview = inflater.inflate(R.layout.youtube_view, container, false);
-        textview = inflater.inflate(R.layout.card_youtube_content,container,false);
+        //textview = inflater.inflate(R.layout.card_youtube_content,container,false);
         List<YouTubeContent> contents = new ArrayList<>();
         List<String> text = new ArrayList<>();
         context = container.getContext();
@@ -47,6 +51,23 @@ public class ContentsFragment extends Fragment {
 //        text1.setText(text.get(2));
         //textView.setText(text.get(2));
 //        CardView cardView= (CardView)rootview.findViewById(R.id.card_you_tube_content);
+
+        ListView list = (ListView)rootview.findViewById(R.id.list);
+        List<String>data = new ArrayList<>();
+
+        //listview에 추가하는 자료
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,data);
+        list.setAdapter(adapter);
+        data.add("라운드숄더 교정루틴A");
+        data.add("거북목 교정법");
+        data.add("[후기]5분만에 라운드 숄더, 굽은등 펴기");
+        adapter.notifyDataSetChanged();
+
+
+        LayoutInflater inflater1 = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater1.inflate(R.layout.card_youtube_content,container,false);
+        TextView text1=view.findViewById(R.id.textView2);
+
 
         RecyclerView recyclerView = (RecyclerView)rootview.findViewById(R.id.main_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(context,LinearLayoutManager.HORIZONTAL,true));
@@ -82,6 +103,18 @@ public class ContentsFragment extends Fragment {
 //        youTubePlayerView.release();
 //    }
 }
+//class FavoirteList extends ListFragment{
+//    private String[] numbers=new String[]{"1","2","3"};
+//    public void onActivityCreated(Bundle savedInstanceState) {
+//
+//        super.onActivityCreated(savedInstanceState);
+//        setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, numbers));
+//        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE); }
+//
+//    public void onListItemClick(ListView I,View v,int position,long id) {
+//        getListView().setItemChecked(position, true);
+//    }
+//}
 
 
 

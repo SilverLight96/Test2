@@ -1,6 +1,7 @@
 package com.example.test2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ public class StatisticsDayActivity extends AppCompatActivity {
     //Button btnBarChart,btnPieChart;
     Switch sw;
     Spinner spinner;
+    String user_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,21 @@ public class StatisticsDayActivity extends AppCompatActivity {
                 }
             }
 
+            public void processDatePickerResult(int year,int month,int day){
 
+                String format =  new String("Current Date: yyyy-MM-dd");
+
+                // [서버 통신]
+
+                //StatisticsFragment.JSONTaskGET task = new StatisticsFragment.JSONTaskGET();
+
+                //String parameter = "?id="+user_id+"&year="+year+"&month="+"&day="+"&hour="; // 특정 year의 기록을 month 단위로 받아옴
+                //String parameter = "?id="+user_id+"&year="+year+"&month="+month+"&day="+"&hour="; // 특정 month의 기록을 day 단위로 받아옴
+                String parameter = "?id="+user_id+"&year="+year+"&month="+month+"&day="+day+"&hour="; // 특정 day의 기록을 hour 단위로 받아옴
+                //String parameter = "?id="+user_id+"&year="+year+"&month="+month+"&day="+day+"&hour="+hour; // 특정 hour의 기록을 minute 단위로 받아옴
+                //task.execute("http://3.92.215.113:4001/posture"+parameter);
+
+            }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 

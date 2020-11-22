@@ -141,62 +141,7 @@ public class StatisticsFragment extends Fragment {
 
 //        textView.setText("Current Date: "+year+"-"+(month+1)+"-"+day);
 //        if(year==2020&&month==8&&day==26) {
-//                    Intent intent = new Intent(MainActivity.this, DayActivity.class);
-//                    startActivity(intent);
-            //현재는 임의로 값을 배정, 이후 mysql값을 받아오는 것으로 수정예정
 
-//            ArrayList<Entry> GoodBad = new ArrayList<>();
-//
-//            GoodBad.add(new BarEntry(0f,0));
-//            GoodBad.add(new BarEntry(0f,1));
-//            GoodBad.add(new BarEntry(0f,2));
-//            GoodBad.add(new BarEntry(0f,3));
-//            GoodBad.add(new BarEntry(0f,4));
-//            GoodBad.add(new BarEntry(0f,5));
-//            GoodBad.add(new BarEntry(46f,6));
-//            GoodBad.add(new BarEntry(46f,7));
-//            GoodBad.add(new BarEntry(51f,8));
-//            GoodBad.add(new BarEntry(73f,9));
-//            GoodBad.add(new BarEntry(41f,10));
-//            GoodBad.add(new BarEntry(60f,11));
-//            GoodBad.add(new BarEntry(69f,12));
-//            GoodBad.add(new BarEntry(69f,13));
-//            GoodBad.add(new BarEntry(69f,14));
-//            GoodBad.add(new BarEntry(0f,15));
-//            GoodBad.add(new BarEntry(0f,16));
-//            GoodBad.add(new BarEntry(0f,17));
-//            GoodBad.add(new BarEntry(45f,18));
-//            GoodBad.add(new BarEntry(40f,19));
-//            GoodBad.add(new BarEntry(50f,20));
-//            GoodBad.add(new BarEntry(0f,21));
-//            GoodBad.add(new BarEntry(0f,22));
-//            GoodBad.add(new BarEntry(0f,23));
-//
-//            //x축, 시간
-//            ArrayList<String> date = new ArrayList<>();
-//            for(int i=0;i<24;i++){
-//                date.add(i+"am");
-//            }
-
-            //여기에서 GoodBad와 date를 불러옴
-            //그래프 구현
-
-
-
-
-            //Daily Report 사용자
-            //사용자의 기록이 0인 경우를 제외하고 평균을 구한다.
-
-            //기준값과 사용자의 데이터 비교
-
-//        }
-//        else{
-//
-//            //chart.clear();
-//            chart.setNoDataText("There's no record of this day.");
-//            text1.setText("There's no evaluate of this day.");
-//
-//        }
     }
 
     class JSONTaskGET extends AsyncTask<String, String, String> {
@@ -258,9 +203,7 @@ public class StatisticsFragment extends Fragment {
             super.onPostExecute(result);
             // [서버 통신]
             //key값을 담는다
-            String[] string = new String[24];
-            //key의 데이터값을 담는다
-            int[] int_arr = new int[24];
+
             LineChart chart = rootView.findViewById(R.id.lineChart);
             YAxis leftYAxis = chart.getAxisLeft();
             leftYAxis.setAxisMaxValue(100f);
@@ -280,40 +223,25 @@ public class StatisticsFragment extends Fragment {
                 else if (temp.equals("Ho")) key = "Hour";
                 else if (temp.equals("Mi")) key = "Min";
 
-                for (int i = 0; i < jsonResult.length(); i++) {
-                    JSONObject parsedResult = new JSONObject(jsonResult.getString(i));
-//                    string += "<"+key+" = "+parsedResult.getString(key)+">\n";
-//                    string += "LR = "+parsedResult.getString("AVG(LR)")+"\n";
-//                    string += "FB = "+parsedResult.getString("AVG(FB)")+"\n";
-                    if (parsedResult.getString(key) == "0") {
-                        string[i] += "0";
-                    } else {
-                        string[i] += parsedResult.getString(key);
-                    }
-                    try {
-                        Double d1 = Double.parseDouble(parsedResult.getString("AVG(LR)"));
-                        Double d2 = Double.parseDouble(parsedResult.getString("AVG(FB)"));
-                        int d = (int) (d1 + d2) / 2;
-                        int_arr[i] += d;
-                        //string+int+string+int....형태가 된다.
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                ArrayList<Entry> GoodBad = new ArrayList<>();
+                for (int i=0; i<24; i++){
+                    GoodBad.add(new Entry(0, i));
                 }
-                //년월일 미완성
-//                textView.setText("Current Date: " + year + "-" + (month + 1) + "-" + day);
-//                if (year == 2020 && month == 8 && day == 26) {
-                    ArrayList<Entry> GoodBad = new ArrayList<>();
-                    //Arrays.sort(string);
-                    //
-                    for (int i = 0; i < 24; i++) {
-                        //정렬 문제는 해결이 필요하다.
-                        if (string[i] == "0") {//19,20,21,0,0,0,0,0,0,0...
-                            GoodBad.add(new Entry(0, i));
-                        } else {
-                            GoodBad.add(new Entry(int_arr[i], i));
-                        }
-                    }
+
+                for (int i = 0; i < jsonResult.length(); i++) {
+                    int hour = 0;
+                    int degree = 0;
+
+                    JSONObject entity = new JSONObject(jsonResult.getString(i));
+                    hour = Integer.parseInt(entity.getString(key));
+
+                    Double d1 = Double.parseDouble(entity.getString("AVG(LR)"));
+                    Double d2 = Double.parseDouble(entity.getString("AVG(FB)"));
+                    int d = (int) (d1 + d2) / 2;
+                    degree = d;
+
+                    GoodBad.set(hour, new Entry(degree, hour));
+                }
 
                     ArrayList<String> date = new ArrayList<>();
                     for (int i = 0; i < 24; i++) {
