@@ -1,6 +1,7 @@
 package com.example.test2;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.test2.ui.YouTubeAdapter;
 import com.example.test2.ui.YouTubeContent;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
@@ -66,10 +69,23 @@ public class ContentsFragment extends Fragment {
 
         list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                data.remove(position);
-                adapter.notifyDataSetChanged();
-                return false;
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
+                AlertDialog.Builder dlg = new AlertDialog.Builder(view.getContext());
+                dlg.setTitle("DELETE")
+                        .setMessage("Really want to Delete?")
+                        .setNegativeButton("No",null)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                //삭제 클릭시 아래꺼
+                                data.remove(position);
+                                adapter.notifyDataSetChanged();
+                                Snackbar.make(view,"Delete Complete",2000).show();
+                            }
+                        })
+                        .show();
+                return true;
             }
         });
 
