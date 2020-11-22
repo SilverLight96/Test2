@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -53,15 +54,24 @@ public class ContentsFragment extends Fragment {
 //        CardView cardView= (CardView)rootview.findViewById(R.id.card_you_tube_content);
 
         ListView list = (ListView)rootview.findViewById(R.id.list);
-        List<String>data = new ArrayList<>();
+        final List<String>data = new ArrayList<>();
 
         //listview에 추가하는 자료
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,data);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,data);
         list.setAdapter(adapter);
         data.add("라운드숄더 교정루틴A");
         data.add("거북목 교정법");
         data.add("[후기]5분만에 라운드 숄더, 굽은등 펴기");
         adapter.notifyDataSetChanged();
+
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                data.remove(position);
+                adapter.notifyDataSetChanged();
+                return false;
+            }
+        });
 
 
         LayoutInflater inflater1 = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
